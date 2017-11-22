@@ -13,7 +13,7 @@ const app = express();
 const corsOptions = {
     origin: '*',
     methods:'GET,PUT,POST,DELETE,OPTIONS',
-    headers:'Content-Type',
+    headers:'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization',
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 
@@ -24,13 +24,13 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(cookieParser());
 
-const webPromotions = require('./promotions');
 const webUsers = require('./users');
 const webShops = require('./shops');
+const webPromotions = require('./promotions');
 
-app.use("/web/promotions",webPromotions);
 app.use("/web/users",webUsers);
 app.use("/web/shops",webShops);
+app.use("/web/promotions",webPromotions);
 
 const webApi = functions.https.onRequest(app);
 

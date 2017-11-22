@@ -13,7 +13,7 @@ const app = express();
 const corsOptions = {
     origin: '*',
     methods:'GET,PUT,POST,DELETE,OPTIONS',
-    headers:'Content-Type',
+    headers:'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization',
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 

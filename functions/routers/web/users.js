@@ -4,7 +4,7 @@ const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 const router = express.Router();
 
-
+const rootUserPath = "users/web";
 
 const mailTransport = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -12,8 +12,8 @@ const mailTransport = nodemailer.createTransport({
     secure: false,
     requireTLS: true,
     auth: {
-        user: 'nitipat.bank2016@gmail.com',
-        pass: 'P@ssw0rd!1;ikoomNbank'
+        user: '',
+        pass: ''
     }
 });
 
@@ -29,25 +29,27 @@ router.post('/login', function(req, res, next) {
     }).then(loginObject => {
         if(loginObject){
             console.log('Authenticate Success!!');
-            firebase.auth().currentUser.getIdToken(true).then(function(idToken){
-                db.ref("users/"+loginObject.uid).once("value",(snapshot) => {
-                    let user = snapshot.val();
-                    console.log("User found: ",user);
-                    if(user){
-                        res.send({
-                            full_name: user.email,
-                            email: user.email,
-                            birthdate: user.birthdate,
-                            gender: user.gender,
-                            mobile_number: user.mobile_number,
-                            token: idToken
-                        });
-                    }else{
-                        console.log("User not found")
-                        res.send({result:false});
-                    }
+            firebase.auth().currentUser.getIdToken(true).then(
+                function(idToken){
+                    db.ref(rootUserPath+"/"+loginObject.uid).once("value",(snapshot) => {
+                        let user = snapshot.val();
+                        console.log("User found: ",user);
+                        if(user){
+                            res.send({
+                                full_name: user.full_name,
+                                email: user.email,
+                                birthdate: user.birthdate,
+                                gender: user.gender,
+                                mobile_number: user.mobile_number,
+                                token: idToken,
+                                role:user.role
+                            });
+                        }else{
+                            console.log("User not found")
+                            res.send({result:false});
+                        }
+                    });
                 });
-            });
         }else{
             console.log('Oops, something went wrong while authenticating:', loginObject);
             res.send({message:error});
@@ -57,7 +59,11 @@ router.post('/login', function(req, res, next) {
 
 router.post('/signup',function(req,res,next){
     let params = JSON.parse(req.body);
-    if(params.password.length >= 8 && params.password === params.comfirmPassword){
+    // console.log("params: ",params);
+    // console.log("params.password.length: ",params.password.length);
+    // console.log("params.password: ",params.password);
+    // console.log("params.confirmPassword: ",params.confirmPassword);
+    if(params.password.length >= 8 && params.password === params.confirmPassword){
 
         admin.auth().createUser({
             email: params.email,
@@ -70,15 +76,15 @@ router.post('/signup',function(req,res,next){
             
             //-------- Send welcome e-mail
             // sendWelcomeEmail(userRecord.email,userRecord.displayName);
-    
-            let userRef = db.ref('users').child(userRecord.uid);
+            
+            let userRef = db.ref(rootUserPath).child(userRecord.uid);
             userRef.set({
                 email: params.email,
                 mobile_number: params.mobile_number,
-                nickname: params.nickname,
                 full_name: params.full_name,
                 gender: params.gender,
-                birthdate: params.birthdate
+                birthdate: params.birthdate,
+                role:params.role
             },error => {
                 if(error){
                     console.log("Found error while save to database: ",error);

@@ -7,8 +7,8 @@ admin.initializeApp({
     storageBucket: "qzy-project.appspot.com"
 });
 
-const firebaseKeyConfig = require("./key/firebaseKeyConfig.json");
 const firebase = require('firebase');
+const firebaseKeyConfig = require("./key/firebaseKeyConfig.json");
 firebase.initializeApp(firebaseKeyConfig);
 
 const mobileApi = require('./routers/mobile/main');
