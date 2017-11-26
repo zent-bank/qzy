@@ -2,6 +2,10 @@ const express = require('express');
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
+const auth = require('../../services/authenticationService_transpile')
+const _ = require('lodash');
+
+
 const router = express.Router();
 
 const rootUserPath = "users/web";
@@ -105,6 +109,30 @@ router.post('/signup',function(req,res,next){
 
 router.post('/sendFCMKey',function(req,res,next){
     
+});
+
+router.get('/searchAllUserForManagement', function(req, res, next) {
+    auth.authenticate(req).then(
+        function(uid){
+            console.log("uid: ",uid);
+            let userRef = db.ref(rootUserPath)
+            let userInfo = [];
+            userRef.once("value",(snapshot) => {
+                let userResults = snapshot.val();
+                console.log("userResults: ",userResults);
+                userInfo = _.map(userResults,function(userResult){
+                    let user = {};
+                    user.full_name = userResult.full_name;
+                    user.user_status = "O";
+                    user.mobile_number = userResult.mobile_number;
+                    user.email = userResult.email;
+                    return user;
+                });;
+                res.send({result:userInfo});  
+            });
+            
+        }
+    );
 });
 
 router.post('/listUserPoint', function(req, res, next) {

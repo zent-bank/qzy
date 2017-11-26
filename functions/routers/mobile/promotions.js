@@ -72,7 +72,7 @@ router.post('/prepareUsePromotions', function(req, res, next) {
                     const epoch = currentDate.unix();
                     const redeemCode = new Buffer(params.shop_id+":"+params.promo_id+":"+uid+":"+epoch).toString('base64');
                     let preparedUrl = req.protocol + '://' + req.get('host') + 
-                                      "/qzy-project/us-central1/webApi/web/promotions/saveUsedPromotion/" +
+                                      "/webApi/web/promotions/saveUsedPromotion/" +
                                       redeemCode;
                     console.log("preparedUrl: ",preparedUrl);
                     const qrFileName = redeemCode + "_" + epoch + ".png";
